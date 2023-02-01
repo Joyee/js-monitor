@@ -216,3 +216,15 @@ window.onload = () => {
     url: `${window.location.host}${window.location.pathname}`,
   })
 }
+
+export const Elog = log.error = (code, detail, extra) => {
+  return log('error', code, detail, extra)
+}
+
+export const Plog = log.product = (code, detail, extra) => {
+  return log('product', code, detail, extra)
+}
+
+export const Ilog = log.info = (code, detail, extra) => {
+  return log('info', code, detail, extra)
+}
