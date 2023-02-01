@@ -217,6 +217,33 @@ window.onload = () => {
   })
 }
 
+// 用户行为数据
+
+// 获取用户平均在线时长
+const OFFLINE_MILL = 15 * 60 * 1000 // 15min 不操作认为不在线
+const SEND_MILL = 5 * 1000 // 每5s打点一次
+let lastTime = Date.now()
+
+window.addEventListener('click', function () {
+  // 检查是否监控用户在线时长
+  const isTimeOnPageFlagOn = _.get(commonConfig, ['record', 'time_on_page'], _.get(DEFAULT_CONFIG, ['record', 'time_on_page']))
+  const isOldTimeOnPageFlagOn = _.get(commonConfig, ['online'], false)
+  const needRecordTimeOnPage = isTimeOnPageFlagOn || isOldTimeOnPageFlagOn
+  if (needRecordTimeOnPage === false) {
+    debugLogger('config.record.time_on_page值为false， 跳过停留时长打点')
+    return
+  }
+  const now = Date.now()
+  const duration = now - SEND_MILL
+  if (duration > OFFLINE_MILL) {
+    lastTime = Date.now()
+  } else if (duration > SEND_MILL) {
+    debugLogger('发送用户留存时间埋点，埋点内容 => ', { duration_ms: duration })
+    // 用户在线时长
+    log.product(10001, { duration_ms: duration })
+  }
+}, false)
+
 export const Elog = log.error = (code, detail, extra) => {
   return log('error', code, detail, extra)
 }
